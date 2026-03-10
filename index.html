@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ImagineBooks - Relatório de Performance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a2a2f;
+            --bg-card: #112e33;
+            --bg-card-hover: #163a41;
+            --teal-primary: #0d4f5a;
+            --teal-light: #1a7a8a;
+            --accent-orange: #e87c3e;
+            --accent-orange-light: #f09a5e;
+            --text-white: #ffffff;
+            --text-light: #b8d4d9;
+            --text-muted: #7aa3ab;
+            --faixa-branca: #f0f0f0;
+            --faixa-cinza: #9e9e9e;
+            --faixa-azul: #1565c0;
+            --faixa-amarela: #f9a825;
+            --faixa-laranja: #e65100;
+            --faixa-verde: #2e7d32;
+            --faixa-roxa: #6a1b9a;
+            --faixa-marrom: #5d4037;
+            --success: #4caf50;
+            --danger: #ef5350;
+            --warning: #ffa726;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-white);
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--teal-primary) 50%, var(--bg-dark) 100%);
+            padding: 30px 40px;
+            border-bottom: 2px solid var(--teal-light);
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(232, 124, 62, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .logo-area { display: flex; align-items: center; gap: 16px; }
+        .logo-icon { display: flex; gap: 2px; align-items: flex-end; }
+        .logo-bar { width: 4px; background: var(--text-white); border-radius: 2px; }
+        .logo-bar:nth-child(1) { height: 16px; }
+        .logo-bar:nth-child(2) { height: 24px; }
+        .logo-bar:nth-child(3) { height: 20px; }
+        .logo-bar:nth-child(4) { height: 28px; }
+        .logo-bar:nth-child(5) { height: 12px; }
+        .logo-text h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { font-size: 12px; font-weight: 400; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* Date Picker */
+        .date-picker-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .date-picker-area label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .date-input {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(26, 122, 138, 0.4);
+            border-radius: 8px;
+            color: var(--text-white);
+            padding: 10px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .date-input:focus { border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(232,124,62,0.15); }
+        .date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+        .date-separator { color: var(--text-muted); font-weight: 600; }
+        .btn-apply {
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-apply:hover { background: var(--accent-orange-light); transform: translateY(-1px); }
+        .quick-filters {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+            justify-content: flex-end;
+        }
+        .btn-quick {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(26,122,138,0.3);
+            color: var(--text-muted);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-quick:hover, .btn-quick.active { background: var(--teal-light); color: white; border-color: var(--teal-light); }
+
+        .belt-strip { height: 4px; display: flex; width: 100%; }
+        .belt-strip div { flex: 1; transition: flex 0.3s ease; }
+        .belt-strip div:hover { flex: 2; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px; }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent-orange), transparent); }
+
+        /* KPI Grid */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(26, 122, 138, 0.2);
+            border-radius: 12px;
+            padding: 22px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card:hover { background: var(--bg-card-hover); border-color: rgba(26, 122, 138, 0.4); transform: translateY(-2px); }
+        .kpi-card .indicator { position: absolute; top: 0; left: 0; width: 4px; height: 100%; border-radius: 12px 0 0 12px; }
+        .kpi-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 10px; }
+        .kpi-card .value { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 6px; transition: all 0.3s; }
+        .kpi-card .subtitle { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+        .kpi-card .icon { position: absolute; top: 18px; right: 20px; font-size: 20px; opacity: 0.6; }
+
+        /* Highlight cards */
+        .highlight-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+        .highlight-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--teal-primary) 100%);
+            border: 1px solid rgba(26, 122, 138, 0.3);
+            border-radius: 12px;
+            padding: 28px;
+            text-align: center;
+            position: relative;
+        }
+        .highlight-card.roas-negative { background: linear-gradient(135deg, #1a1215 0%, #3d1520 100%); border-color: rgba(239, 83, 80, 0.3); }
+        .highlight-card.roas-positive { background: linear-gradient(135deg, #0f1a12 0%, #1a3d20 100%); border-color: rgba(76, 175, 80, 0.3); }
+        .highlight-card .big-value { font-size: 48px; font-weight: 900; line-height: 1; margin-bottom: 8px; transition: all 0.3s; }
+        .highlight-card .big-label { font-size: 14px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
+        .highlight-card .detail { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-danger { background: rgba(239, 83, 80, 0.15); color: var(--danger); }
+        .badge-success { background: rgba(76, 175, 80, 0.15); color: var(--success); }
+
+        /* Chart area */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid rgba(26,122,138,0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            overflow-x: auto;
+        }
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 200px;
+            padding: 0 10px;
+            min-width: fit-content;
+        }
+        .chart-bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 60px;
+        }
+        .chart-bar-pair {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 160px;
+        }
+        .chart-bar {
+            width: 24px;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+        .chart-bar:hover { opacity: 0.85; }
+        .chart-bar .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 4px;
+        }
+        .chart-bar:hover .tooltip { display: block; }
+        .chart-bar-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; }
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+        .chart-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+        /* Funnel */
+        .funnel-steps { display: flex; align-items: center; gap: 0; justify-content: center; margin-bottom: 32px; }
+        .funnel-step { text-align: center; flex: 1; }
+        .funnel-bar {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            margin: 0 -1px;
+        }
+        .funnel-step .funnel-label { font-size: 11px; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .funnel-arrow { color: var(--text-muted); font-size: 18px; padding: 0 4px; }
+        .funnel-conversion { font-size: 10px; color: var(--accent-orange-light); font-weight: 600; margin-top: 2px; }
+        .funnel-step:nth-child(1) .funnel-bar { background: var(--teal-light); border-radius: 8px 0 0 8px; }
+        .funnel-step:nth-child(3) .funnel-bar { background: var(--faixa-azul); }
+        .funnel-step:nth-child(5) .funnel-bar { background: var(--faixa-amarela); color: #333; }
+        .funnel-step:nth-child(7) .funnel-bar { background: var(--accent-orange); }
+        .funnel-step:nth-child(9) .funnel-bar { background: var(--faixa-verde); border-radius: 0 8px 8px 0; }
+
+        /* Written sections */
+        .written-section { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 32px; }
+        .written-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(26, 122, 138, 0.2);
+            border-radius: 12px;
+            padding: 28px;
+        }
+        .written-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+        .written-card ul { list-style: none; padding: 0; }
+        .written-card ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(26, 122, 138, 0.1);
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .written-card ul li:last-child { border-bottom: none; }
+        .written-card ul li .bullet { width: 6px; height: 6px; min-width: 6px; border-radius: 50%; margin-top: 7px; }
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(26,122,138,0.1); }
+        .product-item:last-child { border-bottom: none; }
+        .product-name { font-size: 13px; color: var(--text-light); display: flex; align-items: center; gap: 10px; }
+        .product-qty { font-size: 13px; font-weight: 700; color: var(--text-white); background: rgba(26,122,138,0.2); padding: 4px 12px; border-radius: 20px; }
+        .faixa-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* Orders Table */
+        .orders-table-container {
+            background: var(--bg-card);
+            border: 1px solid rgba(26,122,138,0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            overflow-x: auto;
+        }
+        .orders-table { width: 100%; border-collapse: collapse; }
+        .orders-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(26,122,138,0.2);
+        }
+        .orders-table td {
+            padding: 12px 14px;
+            font-size: 13px;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(26,122,138,0.08);
+        }
+        .orders-table tr:hover td { background: rgba(26,122,138,0.05); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+        .footer { max-width: 1400px; margin: 0 auto; padding: 20px 40px 40px; text-align: center; color: var(--text-muted); font-size: 11px; }
+        .footer a { color: var(--accent-orange); text-decoration: none; }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.4s ease forwards; }
+
+        @media (max-width: 1024px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .highlight-row { grid-template-columns: 1fr; }
+            .written-section { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+            .header { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="belt-strip">
+        <div style="background: var(--faixa-branca)"></div>
+        <div style="background: var(--faixa-cinza)"></div>
+        <div style="background: var(--faixa-azul)"></div>
+        <div style="background: var(--faixa-amarela)"></div>
+        <div style="background: var(--faixa-laranja)"></div>
+        <div style="background: var(--faixa-verde)"></div>
+        <div style="background: var(--faixa-roxa)"></div>
+        <div style="background: var(--faixa-marrom)"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div><div class="logo-bar"></div>
+                </div>
+                <div class="logo-text">
+                    <h1>ImagineBooks</h1>
+                    <span>Dashboard de Performance</span>
+                </div>
+            </div>
+            <div class="date-picker-area">
+                <label>Periodo:</label>
+                <input type="date" id="dateFrom" class="date-input" value="2025-01-01">
+                <span class="date-separator">ate</span>
+                <input type="date" id="dateTo" class="date-input" value="2026-03-10">
+                <button class="btn-apply" onclick="applyFilter()">Aplicar</button>
+                <div class="quick-filters">
+                    <button class="btn-quick" onclick="setQuickFilter('7d')">7 dias</button>
+                    <button class="btn-quick" onclick="setQuickFilter('30d')">30 dias</button>
+                    <button class="btn-quick" onclick="setQuickFilter('90d')">90 dias</button>
+                    <button class="btn-quick" onclick="setQuickFilter('6m')">6 meses</button>
+                    <button class="btn-quick active" onclick="setQuickFilter('all')">Todo periodo</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="dashboard-content"></div>
+    </div>
+
+    <div class="footer">
+        <p>Dashboard gerado automaticamente via API (Meta Ads + WooCommerce) | <a href="https://www.imaginebooks.com.br">imaginebooks.com.br</a></p>
+    </div>
+
+    <div class="belt-strip">
+        <div style="background: var(--faixa-branca)"></div>
+        <div style="background: var(--faixa-cinza)"></div>
+        <div style="background: var(--faixa-azul)"></div>
+        <div style="background: var(--faixa-amarela)"></div>
+        <div style="background: var(--faixa-laranja)"></div>
+        <div style="background: var(--faixa-verde)"></div>
+        <div style="background: var(--faixa-roxa)"></div>
+        <div style="background: var(--faixa-marrom)"></div>
+    </div>
+
+<script>
+// ==================== EMBEDDED DATA ====================
+const META_DATA = [{"date_start":"2025-01-01","date_stop":"2025-01-31","spend":596.76,"reach":77518,"impressions":104814,"clicks":3530,"cpc":0.169054,"cpm":5.693514,"ctr":3.367871,"purchases":0,"add_to_cart":0,"page_likes":127,"view_content":0,"checkouts":0},{"date_start":"2025-02-01","date_stop":"2025-02-28","spend":680,"reach":81862,"impressions":98349,"clicks":3500,"cpc":0.194286,"cpm":6.914153,"ctr":3.558755,"purchases":0,"add_to_cart":0,"page_likes":139,"view_content":0,"checkouts":0},{"date_start":"2025-03-01","date_stop":"2025-03-31","spend":826.84,"reach":84073,"impressions":109288,"clicks":4087,"cpc":0.20231,"cpm":7.565698,"ctr":3.73966,"purchases":0,"add_to_cart":0,"page_likes":128,"view_content":0,"checkouts":0},{"date_start":"2025-04-01","date_stop":"2025-04-30","spend":541.11,"reach":203250,"impressions":208482,"clicks":3067,"cpc":0.17643,"cpm":2.595476,"ctr":1.47111,"purchases":0,"add_to_cart":0,"page_likes":262,"view_content":0,"checkouts":0},{"date_start":"2025-05-01","date_stop":"2025-05-31","spend":1153.35,"reach":115733,"impressions":165105,"clicks":5966,"cpc":0.19332,"cpm":6.985555,"ctr":3.613458,"purchases":0,"add_to_cart":0,"page_likes":782,"view_content":0,"checkouts":0},{"date_start":"2025-06-01","date_stop":"2025-06-30","spend":305.54,"reach":44114,"impressions":53666,"clicks":2223,"cpc":0.137445,"cpm":5.693363,"ctr":4.142287,"purchases":0,"add_to_cart":0,"page_likes":121,"view_content":0,"checkouts":0},{"date_start":"2025-07-01","date_stop":"2025-07-31","spend":943.66,"reach":108721,"impressions":128493,"clicks":3692,"cpc":0.255596,"cpm":7.344058,"ctr":2.873308,"purchases":0,"add_to_cart":0,"page_likes":387,"view_content":0,"checkouts":0},{"date_start":"2025-08-01","date_stop":"2025-08-31","spend":56.34,"reach":4494,"impressions":4595,"clicks":156,"cpc":0.361154,"cpm":12.261153,"ctr":3.394995,"purchases":0,"add_to_cart":0,"page_likes":9,"view_content":0,"checkouts":0},{"date_start":"2025-10-01","date_stop":"2025-10-31","spend":995.39,"reach":27518,"impressions":81120,"clicks":1098,"cpc":0.906548,"cpm":12.270587,"ctr":1.35355,"purchases":7,"add_to_cart":136,"page_likes":212,"view_content":412,"checkouts":16},{"date_start":"2025-11-01","date_stop":"2025-11-30","spend":943.1,"reach":28425,"impressions":62781,"clicks":825,"cpc":1.143152,"cpm":15.022061,"ctr":1.314092,"purchases":2,"add_to_cart":71,"page_likes":133,"view_content":224,"checkouts":9},{"date_start":"2025-12-01","date_stop":"2025-12-31","spend":1386.01,"reach":40352,"impressions":102683,"clicks":1275,"cpc":1.087067,"cpm":13.49795,"ctr":1.241686,"purchases":5,"add_to_cart":186,"page_likes":268,"view_content":290,"checkouts":20},{"date_start":"2026-01-01","date_stop":"2026-01-31","spend":1142.67,"reach":51954,"impressions":118098,"clicks":1169,"cpc":0.977476,"cpm":9.675608,"ctr":0.989856,"purchases":2,"add_to_cart":37,"page_likes":106,"view_content":173,"checkouts":9},{"date_start":"2026-02-01","date_stop":"2026-02-28","spend":1054.22,"reach":33496,"impressions":91905,"clicks":976,"cpc":1.080143,"cpm":11.470758,"ctr":1.061966,"purchases":4,"add_to_cart":40,"page_likes":54,"view_content":128,"checkouts":8},{"date_start":"2026-03-01","date_stop":"2026-03-10","spend":301.48,"reach":126644,"impressions":139237,"clicks":817,"cpc":0.369009,"cpm":2.165229,"ctr":0.586769,"purchases":2,"add_to_cart":5,"page_likes":54,"view_content":5,"checkouts":2}];
+
+const ORDERS_DATA = [{"id":4278,"date":"2026-03-08","status":"failed","total":"79.20","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"}]},{"id":4277,"date":"2026-03-08","status":"failed","total":"68.40","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"}]},{"id":4276,"date":"2026-03-03","status":"processing","total":"68.40","payment_method":"Pix","state":"RJ","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"}]},{"id":4274,"date":"2026-02-12","status":"completed","total":"79.20","payment_method":"Pix","state":"RS","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"}]},{"id":4273,"date":"2026-02-10","status":"completed","total":"180.23","payment_method":"Pix","state":"CE","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"52.16"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"57.28"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"57.29"}]},{"id":4272,"date":"2026-02-09","status":"completed","total":"73.80","payment_method":"Pix","state":"DF","items":[{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"60.30"}]},{"id":4271,"date":"2026-02-08","status":"completed","total":"387.99","payment_method":"Pix","state":"PE","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"49.41"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"57.51"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"59.13"}]},{"id":4269,"date":"2026-01-24","status":"completed","total":"73.80","payment_method":"Pix","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"60.30"}]},{"id":4268,"date":"2026-01-17","status":"completed","total":"73.80","payment_method":"Pix","state":"DF","items":[{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"60.30"}]},{"id":4266,"date":"2026-01-02","status":"completed","total":"139.50","payment_method":"Pix","state":"PE","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"60.30"}]},{"id":4265,"date":"2025-12-31","status":"completed","total":"387.99","payment_method":"Cartao de credito","state":"MG","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"49.41"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"57.51"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"59.13"}]},{"id":4264,"date":"2025-12-24","status":"completed","total":"237.51","payment_method":"Pix","state":"RJ","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"52.16"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"57.28"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"57.28"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"57.29"}]},{"id":4263,"date":"2025-12-23","status":"completed","total":"387.99","payment_method":"Pix","state":"MT","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"49.41"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"57.51"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"59.13"}]},{"id":4261,"date":"2025-12-20","status":"completed","total":"73.80","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"60.30"}]},{"id":4260,"date":"2025-12-19","status":"completed","total":"68.40","payment_method":"Cartao de credito","state":"PI","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"}]},{"id":4256,"date":"2025-12-16","status":"completed","total":"134.10","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"60.30"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"60.30"}]},{"id":4255,"date":"2025-12-09","status":"completed","total":"169.97","payment_method":"Cartao de credito","state":"PR","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":3,"total":"156.47"}]},{"id":4252,"date":"2025-12-02","status":"completed","total":"229.44","payment_method":"Pix","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"60.71"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"62.41"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"62.42"}]},{"id":4251,"date":"2025-11-26","status":"completed","total":"185.36","payment_method":"Pix","state":"SC","items":[{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"57.28"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"57.29"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"57.29"}]},{"id":4249,"date":"2025-11-20","status":"completed","total":"128.70","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"60.30"}]},{"id":4248,"date":"2025-11-17","status":"completed","total":"68.40","payment_method":"Pix","state":"MT","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"}]},{"id":4247,"date":"2025-11-17","status":"completed","total":"387.99","payment_method":"Pix","state":"RO","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"49.41"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"57.51"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"59.13"}]},{"id":4242,"date":"2025-10-23","status":"completed","total":"79.20","payment_method":"Pix","state":"MG","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"}]},{"id":4240,"date":"2025-10-21","status":"completed","total":"134.10","payment_method":"Pix","state":"MG","items":[{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"60.30"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"60.30"}]},{"id":4237,"date":"2025-10-18","status":"completed","total":"73.80","payment_method":"Cartao de credito","state":"SC","items":[{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"60.30"}]},{"id":4231,"date":"2025-10-11","status":"completed","total":"387.99","payment_method":"Cartao de credito","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"59.13"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"57.51"},{"name":"ImagineBooks Judo - Vol.4 Faixa Amarela ponta Laranja e Faixa Laranja","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.2 Faixa Cinza ponta Azul e Faixa Azul","qty":1,"total":"54.27"},{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"49.41"}]},{"id":4230,"date":"2025-10-11","status":"completed","total":"79.20","payment_method":"Pix","state":"MG","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"}]},{"id":4229,"date":"2025-10-10","status":"completed","total":"79.20","payment_method":"Pix","state":"MG","items":[{"name":"ImagineBooks Judo - Vol.7 Faixa Marrom","qty":1,"total":"65.70"}]},{"id":4228,"date":"2025-10-08","status":"completed","total":"193.91","payment_method":"Pix","state":"SP","items":[{"name":"ImagineBooks Judo - Vol.3 Faixa Azul ponta Amarela e Faixa Amarela","qty":1,"total":"57.29"},{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"60.71"},{"name":"ImagineBooks Judo - Vol.6 Faixa Roxa","qty":1,"total":"62.41"}]},{"id":4227,"date":"2025-10-07","status":"completed","total":"93.60","payment_method":"Pix","state":"PR","items":[{"name":"ImagineBooks Judo - Vol.5 Faixa Verde","qty":1,"total":"63.90"}]},{"id":4184,"date":"2025-10-01","status":"completed","total":"68.40","payment_method":"Cartao de credito","state":"PR","items":[{"name":"ImagineBooks Judo - Vol.1 Faixa Branca ponta Cinza e Faixa Cinza","qty":1,"total":"54.90"}]}];
+
+// ==================== HELPER FUNCTIONS ====================
+const FAIXA_COLORS = {
+    'Vol.1': '#f0f0f0', 'Vol.2': '#9e9e9e', 'Vol.3': '#1565c0', 'Vol.4': '#f9a825',
+    'Vol.5': '#2e7d32', 'Vol.6': '#6a1b9a', 'Vol.7': '#5d4037'
+};
+const FAIXA_NAMES = {
+    'Vol.1': 'Faixa Branca/Cinza', 'Vol.2': 'Faixa Cinza/Azul', 'Vol.3': 'Faixa Azul/Amarela',
+    'Vol.4': 'Faixa Amarela/Laranja', 'Vol.5': 'Faixa Verde', 'Vol.6': 'Faixa Roxa', 'Vol.7': 'Faixa Marrom'
+};
+const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function fmt(n) { return n.toLocaleString('pt-BR'); }
+function fmtMoney(n) { return 'R$ ' + n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+function filterMeta(from, to) {
+    return META_DATA.filter(m => {
+        return m.date_start <= to && m.date_stop >= from;
+    });
+}
+function filterOrders(from, to) {
+    return ORDERS_DATA.filter(o => o.date >= from && o.date <= to);
+}
+
+function sumMeta(data, field) { return data.reduce((s, m) => s + (m[field] || 0), 0); }
+
+function setQuickFilter(period) {
+    const today = new Date();
+    let from;
+    if (period === '7d') from = new Date(today - 7 * 86400000);
+    else if (period === '30d') from = new Date(today - 30 * 86400000);
+    else if (period === '90d') from = new Date(today - 90 * 86400000);
+    else if (period === '6m') { from = new Date(today); from.setMonth(from.getMonth() - 6); }
+    else { from = new Date('2025-01-01'); }
+
+    document.getElementById('dateFrom').value = from.toISOString().split('T')[0];
+    document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+
+    document.querySelectorAll('.btn-quick').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    applyFilter();
+}
+
+// ==================== MAIN RENDER ====================
+function applyFilter() {
+    const from = document.getElementById('dateFrom').value;
+    const to = document.getElementById('dateTo').value;
+
+    const meta = filterMeta(from, to);
+    const orders = filterOrders(from, to);
+
+    const totalSpend = sumMeta(meta, 'spend');
+    const totalReach = sumMeta(meta, 'reach');
+    const totalImpressions = sumMeta(meta, 'impressions');
+    const totalLikes = sumMeta(meta, 'page_likes');
+    const totalATC = sumMeta(meta, 'add_to_cart');
+    const totalViewContent = sumMeta(meta, 'view_content');
+    const totalCheckouts = sumMeta(meta, 'checkouts');
+
+    const completedOrders = orders.filter(o => o.status === 'completed' || o.status === 'processing');
+    const failedOrders = orders.filter(o => o.status === 'failed');
+    const totalRevenue = completedOrders.reduce((s, o) => s + parseFloat(o.total), 0);
+    const ticketMedio = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
+    const roas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+    const costPerResult = completedOrders.length > 0 ? totalSpend / completedOrders.length : 0;
+    const maxOrder = completedOrders.length > 0 ? Math.max(...completedOrders.map(o => parseFloat(o.total))) : 0;
+
+    // Products
+    const productCount = {};
+    completedOrders.forEach(o => {
+        o.items.forEach(i => {
+            const vol = i.name.match(/Vol\.\d/)?.[0] || i.name;
+            productCount[vol] = (productCount[vol] || 0) + i.qty;
+        });
+    });
+    const sortedProducts = Object.entries(productCount).sort((a, b) => b[1] - a[1]);
+
+    // Chart data
+    const maxSpend = Math.max(...meta.map(m => m.spend), 1);
+    const maxRev = Math.max(...meta.map(m => {
+        const monthOrders = completedOrders.filter(o => o.date >= m.date_start && o.date <= m.date_stop);
+        return monthOrders.reduce((s, o) => s + parseFloat(o.total), 0);
+    }), 1);
+    const chartMax = Math.max(maxSpend, maxRev);
+
+    let chartBars = '';
+    meta.forEach(m => {
+        const monthLabel = MONTH_NAMES[parseInt(m.date_start.split('-')[1]) - 1] + '/' + m.date_start.split('-')[0].slice(2);
+        const monthOrders = completedOrders.filter(o => o.date >= m.date_start && o.date <= m.date_stop);
+        const monthRev = monthOrders.reduce((s, o) => s + parseFloat(o.total), 0);
+        const spendH = Math.max((m.spend / chartMax) * 150, 4);
+        const revH = Math.max((monthRev / chartMax) * 150, 4);
+        chartBars += `
+            <div class="chart-bar-group">
+                <div class="chart-bar-pair">
+                    <div class="chart-bar" style="height:${spendH}px; background: var(--accent-orange);">
+                        <div class="tooltip">Investido: ${fmtMoney(m.spend)}</div>
+                    </div>
+                    <div class="chart-bar" style="height:${revH}px; background: var(--faixa-verde);">
+                        <div class="tooltip">Receita: ${fmtMoney(monthRev)}</div>
+                    </div>
+                </div>
+                <div class="chart-bar-label">${monthLabel}</div>
+            </div>`;
+    });
+
+    // Products HTML
+    let productsHTML = '';
+    sortedProducts.forEach(([vol, qty]) => {
+        const color = FAIXA_COLORS[vol] || '#888';
+        const name = FAIXA_NAMES[vol] || vol;
+        productsHTML += `
+            <div class="product-item">
+                <div class="product-name"><span class="faixa-dot" style="background: ${color}"></span>${vol} - ${name}</div>
+                <span class="product-qty">${qty} un.</span>
+            </div>`;
+    });
+    if (!productsHTML) productsHTML = '<div style="color: var(--text-muted); font-size: 13px; padding: 10px 0;">Nenhuma venda no periodo selecionado</div>';
+
+    // Orders table
+    let ordersHTML = '';
+    orders.slice(0, 20).forEach(o => {
+        const statusColor = o.status === 'completed' ? 'var(--success)' : o.status === 'processing' ? 'var(--warning)' : 'var(--danger)';
+        const statusLabel = o.status === 'completed' ? 'Concluido' : o.status === 'processing' ? 'Processando' : 'Falhou';
+        const itemNames = o.items.map(i => i.name.replace('ImagineBooks Judo - ', '')).join(', ');
+        ordersHTML += `<tr>
+            <td>#${o.id}</td>
+            <td>${o.date.split('-').reverse().join('/')}</td>
+            <td><span class="status-dot" style="background:${statusColor}"></span>${statusLabel}</td>
+            <td style="font-weight:700;">${fmtMoney(parseFloat(o.total))}</td>
+            <td>${o.payment_method}</td>
+            <td>${o.state}</td>
+            <td style="font-size:11px;">${itemNames}</td>
+        </tr>`;
+    });
+
+    // Funnel
+    const funnelATC = totalATC || 0;
+    const funnelCheckouts = totalCheckouts || 0;
+    const funnelPurchases = completedOrders.length;
+    const funnelVC = totalViewContent || 0;
+
+    // Highlights analysis
+    const pixOrders = completedOrders.filter(o => o.payment_method.includes('Pix')).length;
+    const pixPercent = completedOrders.length > 0 ? Math.round((pixOrders / completedOrders.length) * 100) : 0;
+    const colecaoCompleta = completedOrders.filter(o => o.items.length >= 7).length;
+
+    const roasClass = roas >= 1 ? 'roas-positive' : 'roas-negative';
+    const roasColor = roas >= 1 ? 'var(--success)' : 'var(--danger)';
+    const roasBadge = roas >= 1 ? '<span class="badge badge-success">Positivo</span>' : '<span class="badge badge-danger">Negativo</span>';
+
+    const fromFormatted = from.split('-').reverse().join('/');
+    const toFormatted = to.split('-').reverse().join('/');
+
+    // ==================== BUILD HTML ====================
+    document.getElementById('dashboard-content').innerHTML = `
+        <div style="text-align:center; margin-bottom:24px; color: var(--text-muted); font-size:13px;">
+            Exibindo dados de <strong style="color:var(--text-white)">${fromFormatted}</strong> ate <strong style="color:var(--text-white)">${toFormatted}</strong>
+        </div>
+
+        <div class="section-title">Meta Ads</div>
+        <div class="kpi-grid animate-in">
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--faixa-azul)"></div>
+                <div class="icon">&#128065;</div>
+                <div class="label">Alcance</div>
+                <div class="value" style="color: var(--faixa-azul)">${fmt(totalReach)}</div>
+                <div class="subtitle">Pessoas atingidas</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--teal-light)"></div>
+                <div class="icon">&#128240;</div>
+                <div class="label">Impressoes</div>
+                <div class="value" style="color: var(--teal-light)">${fmt(totalImpressions)}</div>
+                <div class="subtitle">Vezes que o anuncio apareceu</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--faixa-verde)"></div>
+                <div class="icon">&#128101;</div>
+                <div class="label">Novos Seguidores</div>
+                <div class="value" style="color: var(--faixa-verde)">${fmt(totalLikes)}</div>
+                <div class="subtitle">Net likes na pagina</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--accent-orange)"></div>
+                <div class="icon">&#128176;</div>
+                <div class="label">Valor Investido</div>
+                <div class="value" style="color: var(--accent-orange)">${fmtMoney(totalSpend)}</div>
+                <div class="subtitle">Gasto total no periodo</div>
+            </div>
+        </div>
+
+        <div class="section-title">Dados do Site (WooCommerce)</div>
+        <div class="kpi-grid animate-in">
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--faixa-amarela)"></div>
+                <div class="icon">&#128722;</div>
+                <div class="label">Adicao ao Carrinho</div>
+                <div class="value" style="color: var(--faixa-amarela)">${fmt(funnelATC)}</div>
+                <div class="subtitle">Produtos adicionados</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--faixa-verde)"></div>
+                <div class="icon">&#9989;</div>
+                <div class="label">Vendas Realizadas</div>
+                <div class="value" style="color: var(--faixa-verde)">${completedOrders.length}</div>
+                <div class="subtitle">Pedidos concluidos / processando</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--danger)"></div>
+                <div class="icon">&#10060;</div>
+                <div class="label">Pedidos com Falha</div>
+                <div class="value" style="color: var(--danger)">${failedOrders.length}</div>
+                <div class="subtitle">Pagamento recusado</div>
+            </div>
+            <div class="kpi-card">
+                <div class="indicator" style="background: var(--faixa-roxa)"></div>
+                <div class="icon">&#127919;</div>
+                <div class="label">Custo por Resultado</div>
+                <div class="value" style="color: var(--faixa-roxa)">${completedOrders.length > 0 ? fmtMoney(costPerResult) : 'N/A'}</div>
+                <div class="subtitle">Custo por compra</div>
+            </div>
+        </div>
+
+        <div class="section-title">Resultados Financeiros</div>
+        <div class="highlight-row animate-in">
+            <div class="highlight-card">
+                <div class="big-value" style="color: var(--faixa-verde)">${fmtMoney(totalRevenue)}</div>
+                <div class="big-label">Receita Gerada</div>
+                <div class="detail">${completedOrders.length} pedidos no periodo</div>
+            </div>
+            <div class="highlight-card">
+                <div class="big-value" style="color: var(--faixa-amarela)">${completedOrders.length > 0 ? fmtMoney(ticketMedio) : 'R$ 0'}</div>
+                <div class="big-label">Ticket Medio</div>
+                <div class="detail">Maior pedido: ${fmtMoney(maxOrder)}</div>
+            </div>
+            <div class="highlight-card ${roasClass}">
+                <div class="big-value" style="color: ${roasColor}">${roas.toFixed(2)}x</div>
+                <div class="big-label">ROAS</div>
+                <div class="detail">${roasBadge} Investiu ${fmtMoney(totalSpend)} / Faturou ${fmtMoney(totalRevenue)}</div>
+            </div>
+        </div>
+
+        <div class="section-title">Investimento vs Receita (por mes)</div>
+        <div class="chart-container animate-in">
+            <div class="chart-bars">${chartBars}</div>
+            <div class="chart-legend">
+                <div class="chart-legend-item"><div class="chart-legend-dot" style="background: var(--accent-orange)"></div>Investimento Meta Ads</div>
+                <div class="chart-legend-item"><div class="chart-legend-dot" style="background: var(--faixa-verde)"></div>Receita WooCommerce</div>
+            </div>
+        </div>
+
+        ${funnelATC > 0 ? `
+        <div class="section-title">Funil de Conversao</div>
+        <div class="funnel-steps animate-in">
+            <div class="funnel-step"><div class="funnel-bar">${fmt(totalReach)}</div><div class="funnel-label">Alcance</div></div>
+            <div class="funnel-arrow">&#10145;</div>
+            <div class="funnel-step"><div class="funnel-bar">${fmt(funnelVC)}</div><div class="funnel-label">View Content</div><div class="funnel-conversion">${totalReach > 0 ? ((funnelVC/totalReach)*100).toFixed(2) : 0}%</div></div>
+            <div class="funnel-arrow">&#10145;</div>
+            <div class="funnel-step"><div class="funnel-bar">${fmt(funnelATC)}</div><div class="funnel-label">Add to Cart</div><div class="funnel-conversion">${funnelVC > 0 ? ((funnelATC/funnelVC)*100).toFixed(1) : 0}%</div></div>
+            <div class="funnel-arrow">&#10145;</div>
+            <div class="funnel-step"><div class="funnel-bar">${fmt(funnelCheckouts)}</div><div class="funnel-label">Checkout</div><div class="funnel-conversion">${funnelATC > 0 ? ((funnelCheckouts/funnelATC)*100).toFixed(1) : 0}%</div></div>
+            <div class="funnel-arrow">&#10145;</div>
+            <div class="funnel-step"><div class="funnel-bar">${funnelPurchases}</div><div class="funnel-label">Compras</div><div class="funnel-conversion">${funnelCheckouts > 0 ? ((funnelPurchases/funnelCheckouts)*100).toFixed(1) : 0}%</div></div>
+        </div>
+        ` : ''}
+
+        <div class="section-title">Historico de Pedidos</div>
+        <div class="orders-table-container animate-in">
+            <table class="orders-table">
+                <thead><tr><th>Pedido</th><th>Data</th><th>Status</th><th>Total</th><th>Pagamento</th><th>UF</th><th>Produtos</th></tr></thead>
+                <tbody>${ordersHTML || '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">Nenhum pedido no periodo</td></tr>'}</tbody>
+            </table>
+        </div>
+
+        <div class="section-title">Analise Detalhada</div>
+        <div class="written-section animate-in">
+            <div class="written-card">
+                <h3><span style="color: var(--faixa-amarela)">&#128218;</span> Produtos Mais Vendidos</h3>
+                ${productsHTML}
+            </div>
+            <div class="written-card">
+                <h3><span style="color: var(--accent-orange)">&#11088;</span> Destaques do Periodo</h3>
+                <ul>
+                    <li><span class="bullet" style="background: var(--faixa-verde)"></span><div><strong>${colecaoCompleta} venda(s) de colecao completa</strong> (7 volumes) - clientes que compram tudo de uma vez representam alto ticket.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-azul)"></span><div><strong>${pixPercent}% dos pagamentos sao via Pix</strong> - ${pixOrders} de ${completedOrders.length} pedidos. Publico prefere pagamento instantaneo.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-amarela)"></span><div><strong>Ticket medio de ${fmtMoney(ticketMedio)}</strong> - ${ticketMedio > 150 ? 'Acima do valor de 1 livro, indicando compras multiplas.' : 'Proximo ao valor de 1 livro, oportunidade de aumentar.'}</div></li>
+                    <li><span class="bullet" style="background: var(--danger)"></span><div><strong>${failedOrders.length} pedido(s) com falha</strong> no periodo - potencial de ${fmtMoney(failedOrders.reduce((s,o) => s + parseFloat(o.total), 0))} perdidos.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-roxa)"></span><div><strong>Total investido: ${fmtMoney(totalSpend)}</strong> em Meta Ads com ROAS de ${roas.toFixed(2)}x.</div></li>
+                </ul>
+            </div>
+            <div class="written-card">
+                <h3><span style="color: var(--faixa-verde)">&#128640;</span> Sugestoes de Melhoria</h3>
+                <ul>
+                    <li><span class="bullet" style="background: var(--danger)"></span><div><strong>Reativar campanha de Conversao</strong> - Historicamente apresentou custo por compra 5x menor que a de Catalogo.</div></li>
+                    <li><span class="bullet" style="background: var(--accent-orange)"></span><div><strong>Criar bundle "Colecao Completa"</strong> com desconto atrativo - ${colecaoCompleta} cliente(s) ja compraram todos os 7 volumes.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-amarela)"></span><div><strong>Remarketing para carrinhos abandonados</strong> - ${funnelATC} add to cart viraram apenas ${funnelPurchases} vendas.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-azul)"></span><div><strong>Ampliar desconto no Pix</strong> - ${pixPercent}% ja prefere Pix, incentivo extra pode aumentar conversao.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-verde)"></span><div><strong>Campanha B2B para academias</strong> - Explorar descontos progressivos (15-20%) para compras em lote com ticket muito mais alto.</div></li>
+                    <li><span class="bullet" style="background: var(--faixa-roxa)"></span><div><strong>Otimizar checkout</strong> - Taxa de cart-to-checkout pode ser melhorada com processo simplificado e selos de seguranca.</div></li>
+                </ul>
+            </div>
+        </div>
+    `;
+}
+
+// Initial load
+applyFilter();
+</script>
+
+</body>
+</html>
